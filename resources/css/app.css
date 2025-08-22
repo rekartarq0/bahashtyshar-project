@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* @import "~@fortawesome/fontawesome-free/css/all.css"; */
+
+[x-cloak] {
+    display: none;
+}
+
+@layer utilities {
+    .rtl {
+        direction: rtl;
+    }
+}
+
+.custom-confirm-box {
+    font-family: "DroidKufi", sans-serif;
+    text-align: right;
+    direction: rtl;
+}
+
+.custom-message {
+    font-family: "DroidKufi", sans-serif;
+    text-align: right;
+    direction: rtl;
+}
+
+.el-message-box__title {
+    font-family: "DroidKufi", sans-serif;
+    text-align: right;
+}
+
+.el-message-box__btns {
+    font-family: "DroidKufi", sans-serif;
+    text-align: right;
+}
+
+.el-button {
+    margin: 2px;
+}
+
+.el-select__wrapper {
+    text-align: right !important;
+    font-family: "DroidKufi", sans-serif;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+/* Remove the border on focus specifically */
+.el-select__wrapper:focus {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.el-input__wrapper {
+    padding: 0 !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+}
+
+.el-popover.el-popper {
+    direction: rtl !important;
+    font-family: "DroidKufi", sans-serif;
+}
+
+.el-pagination {
+    direction: rtl !important;
+}
+
+
+
+.el-pagination .el-icon {
+    transform: rotate(180deg);
+}
+
+.el-input__inner,
+.el-input__inner:focus,
+.el-input__inner:hover {
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: 0 0 0 0px #409eff !important;
+    outline: none;
+}
+
+.el-select-dropdown__item {
+    text-align: right !important;
+    font-family: "DroidKufi", sans-serif;
+}
+
+@font-face {
+    font-family: "NRT";
+    src: url("/assets/font/NRT-Reg.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "DroidKufi";
+    src: url("/assets/font/DroidKufi-Regular.ttf") format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Sarchia_Qaisy_bold";
+    src: url("/assets/font/72_Sarchia_Qaisy.ttf") format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@layer utilities {
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    /* Set the width of the scrollbar */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 3px;
+    }
+
+    /* Track (background) */
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        /* Light grey */
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #bbbbbb;
+        /* Green */
+        border-radius: 5px;
+        /* Rounded corners */
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #888888;
+        /* Dark grey */
+    }
+}
