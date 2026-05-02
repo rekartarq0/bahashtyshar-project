@@ -87,4 +87,33 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProjectStage::class);
     }
+    public function InvoiceProjects()
+    {
+        return $this->hasMany(InvoiceProjects::class);
+    }
+    public function invoice()
+    {
+        return $this->hasMany(Invoices::class);
+    }
+    public function Mulk()
+    {
+        return $this->hasMany(Mulks::class);
+    }
+    public function Customer()
+    {
+        return $this->hasMany(Customers::class);
+    }
+    public function MulkStage()
+    {
+        return $this->hasMany(MulkStages::class);
+    }
+    public function invoiceAsaish()
+    {
+        return $this->hasMany(InvoicesAsaish::class);
+    }
+    //InvoiceNormal
+    public function invoiceNormal()
+    {
+        return $this->hasMany(InvoiceNormal::class);
+    }
 }

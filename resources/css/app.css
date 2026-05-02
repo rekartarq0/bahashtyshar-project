@@ -83,6 +83,9 @@
     outline: none;
 }
 
+.el-form-item__error {
+    right: 0 !important;
+}
 .el-select-dropdown__item {
     text-align: right !important;
     font-family: "DroidKufi", sans-serif;

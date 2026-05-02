@@ -10,8 +10,25 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ProjectStage extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = ['project_id', 'stage', 'start_time', 'end_time', 'user_id'];
 
+    protected $fillable = [
+        'project_id',
+        'stage',
+        'start_time',
+        'end_time',
+        'user_id',
+        'is_accepted',
+        'backed_from_pricing',
+        'note',
+        'is_waiting',
+        'designer_name',
+        'is_pricing_complete',
+    ];
+    protected $casts = [
+        'backed_from_pricing' => 'boolean',
+        'is_waiting' => 'boolean',
+        'is_pricing_complete' => 'boolean',
+    ];
     public function project()
     {
         return $this->belongsTo(Projects::class, 'project_id');

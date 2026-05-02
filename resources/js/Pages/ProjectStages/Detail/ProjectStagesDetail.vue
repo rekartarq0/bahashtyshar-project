@@ -56,25 +56,39 @@ function resetForm() {
 }
 
 // ✅ Constants
-const allStages = ["Planning", "Creative", "Design", "Sale"]
+const allStages = [
+  'Sale',
+    'Measurment',
+    'Design',
+    'Pricing',
+    'Creative',
+    'Planning',
+    'Reklam',
+]
 
 // ✅ Helpers
 function getStageTitle(stage) {
   const titles = {
-    Planning: "پلاندانان",
-    Creative: "دروستکردن",
-    Design: "دیزاین",
     Sale: "فرۆشتن",
+    Design: "دیزاین",
+    Creative: "دروستکردن",
+    Planning: "دانان",
+    Reklam: "ڕیکلام",
+    Measurment: "قیاسکردن",
+    Pricing: "نرخ پێدان",
   }
   return titles[stage] || stage
 }
 
 function getStageColor(stage) {
   const stageColors = {
-    Planning: "bg-danger",
-    Creative: "bg-warning",
-    Design: "bg-primary",
-    Sale: "bg-success",
+    Planning: "bg-gradient-to-r from-fuchsia-800 to-fuchsia-600 to-fuchsia-500",
+    Creative: "bg-gradient-to-r from-fuchsia-800 to-fuchsia-600 to-fuchsia-500",
+    Design: "bg-gradient-to-r from-fuchsia-800 to-fuchsia-600 to-fuchsia-500",
+    Sale: "bg-gradient-to-r from-fuchsia-800 to-fuchsia-600 to-fuchsia-500",
+    Reklam: "bg-gradient-to-r from-fuchsia-800 to-fuchsia-600 to-fuchsia-500",
+    Measurment: "bg-gradient-to-r from-fuchsia-800 to-fuchsia-600 to-fuchsia-500",
+    Pricing: "bg-gradient-to-r from-fuchsia-800 to-fuchsia-600 to-fuchsia-500",
   }
   return stageColors[stage] || "bg-gray-500"
 }
@@ -245,7 +259,7 @@ function getNextStageToInsert() {
         <!-- Stage Title -->
         <div
           :class="[
-            'px-3 py-2 text-white rounded font-droidkufi w-full text-center',
+            'w-full text-center py-2 rounded-sm text-white font-bold text-lg mb-6',
             getStageColor(stageName)
           ]"
         >

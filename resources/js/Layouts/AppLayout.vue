@@ -29,7 +29,6 @@ const logout = () => {
 // Handle hover states for dropdowns
 const showDocsDropdown = ref(false);
 
-
 </script>
 
 
@@ -47,18 +46,26 @@ const showDocsDropdown = ref(false);
                             <!-- Logo -->
                             <div class="shrink-0 flex items-center">
                                 <Link :href="route('dashboard')">
-                                <ApplicationMark class="block h-9 w-auto" />
+                                    <ApplicationMark class="block h-9 w-auto" />
                                 </Link>
                             </div>
 
                             <div class="hidden space-x-4 sm:-my-px sm:ms-5 sm:flex">
                                 <!-- Dashboard fastfood application Link -->
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')"
+                                <NavLink v-if="can('read dashboard')" :href="route('dashboard')"
+                                    :active="route().current('dashboard')"
                                     :class="{ 'border-b-2 border-black': route().current('dashboard') }">
                                     <h4 class="font-bold font-droidkufi text-black dark:text-black pl-1 sm:pl-2">
                                         داشبۆرد
                                     </h4>
                                 </NavLink>
+                                <NavLink v-if="can('read dashboard')" :href="route('mulks.dashboard')"
+                                    :active="route().current('mulks.dashboard')"
+                                    :class="{ 'border-b-2 border-black': route().current('mulks.dashboard') }">
+                                    <h4 class="font-bold font-droidkufi text-black dark:text-black pl-1 sm:pl-2">
+داشبۆرد ٢                                    </h4>
+                                </NavLink>
+
 
 
 
@@ -87,6 +94,29 @@ const showDocsDropdown = ref(false);
                                             <ul v-if="showDocsDropdown" class="absolute shadow left-0 hidden mt-0 border-t-2 border-success 
                                                  space-y-2 bg-white text-black p-2 group-hover:block">
                                                 <li>
+                                                    <NavLink v-if="can('read projects')" :href="route('typemulk.index')"
+                                                        :active="route().current('typemulk.index')"
+                                                        :class="{ 'border-b-0 border-b-transparent ': route().current('typemulk.index') }">
+                                                        <p
+                                                            class="font-droidkufi border-b-transparent text-primary hover:text-success pl-1 sm:pl-2">
+                                                            جۆری موڵک
+                                                        </p>
+                                                    </NavLink>
+                                                </li>
+
+
+                                                <li>
+                                                    <NavLink v-if="can('read projects')"
+                                                        :href="route('locations.index')"
+                                                        :active="route().current('typeprojects.index')"
+                                                        :class="{ 'border-b-0 border-b-transparent ': route().current('typeprojects.index') }">
+                                                        <p
+                                                            class="font-droidkufi border-b-transparent text-primary hover:text-success pl-1 sm:pl-2">
+                                                            ناونیشانەکان </p>
+                                                    </NavLink>
+                                                </li>
+
+                                                <li>
                                                     <NavLink v-if="can('read users')" :href="route('users.index')"
                                                         :active="route().current('users.index')"
                                                         :class="{ 'border-b-0 border-b-transparent ': route().current('users.index') }">
@@ -106,9 +136,8 @@ const showDocsDropdown = ref(false);
                                                         </p>
                                                     </NavLink>
                                                 </li>
-                                                 <li>
-                                                    <NavLink 
-                                                        :href="route('settings.index')"
+                                                <li>
+                                                    <NavLink :href="route('settings.index')"
                                                         :active="route().current('settings.index')"
                                                         :class="{ 'border-b-0 border-b-transparent ': route().current('settings.index') }">
                                                         <p
@@ -119,27 +148,47 @@ const showDocsDropdown = ref(false);
                                                 </li>
 
 
-
                                             </ul>
                                         </li>
                                     </ul>
                                 </nav>
-
-                                <NavLink v-if="can('read projects')" :href="route('projects.index')"
+                                <!-- repports -->
+                                <!-- <NavLink v-if="can('read repport')" :href="route('repport')" :active="route().current('repport')"
+                                :class="{ 'border-b-2 border-black': route().current('repport') }">
+                                <h4 class="font-bold font-droidkufi text-black dark:text-black pl-1 sm:pl-2">
+                                    ڕاپۆرتەکان
+                                </h4>
+                            </NavLink> -->
+                                <!--mullks  -->
+                                <NavLink v-if="can('read repport')" :href="route('projects.index')"
                                     :active="route().current('projects.index')"
                                     :class="{ 'border-b-2 border-black': route().current('projects.index') }">
                                     <h4 class="font-bold font-droidkufi text-black dark:text-black pl-1 sm:pl-2">
-                                        پڕۆژەکان
+                                        مووڵکەکان
                                     </h4>
                                 </NavLink>
-                             
-                               
-
-                             <!-- repports -->
-                                <NavLink :href="route('repport')" :active="route().current('repport')"
-                                    :class="{ 'border-b-2 border-black': route().current('repport') }">
+                                <!-- customers -->
+                                <NavLink v-if="can('read repport')" :href="route('customers.index')"
+                                    :active="route().current('customers.index')"
+                                    :class="{ 'border-b-2 border-black': route().current('customers.index') }">
                                     <h4 class="font-bold font-droidkufi text-black dark:text-black pl-1 sm:pl-2">
-                                        ڕاپۆرتەکان
+                                        کڕیارەکان
+                                    </h4>
+                                </NavLink>
+                                <!-- reppport assaish -->
+                                <NavLink v-if="can('read repport')" :href="route('invoicesAsaish.index')"
+                                :active="route().current('invoicesAsaish.index')"
+                                :class="{ 'border-b-2 border-black': route().current('invoicesAsaish.index') }">
+                                <h4 class="font-bold font-droidkufi text-black dark:text-black pl-1 sm:pl-2">
+                                    ڕاپۆرتی ئاسایش
+                                </h4>
+                            </NavLink>
+                            <!-- reppport normal -->
+                                <NavLink v-if="can('read repport')" :href="route('invoicenormal.index')"
+                                    :active="route().current('invoicenormal.index')"
+                                    :class="{ 'border-b-2 border-black': route().current('invoicenormal.index') }">
+                                    <h4 class="font-bold font-droidkufi text-black dark:text-black pl-1 sm:pl-2">
+                                        ڕاپۆرتی ئاسایی
                                     </h4>
                                 </NavLink>
                             </div>
@@ -297,100 +346,59 @@ const showDocsDropdown = ref(false);
                         </div>
                     </div>
                 </div>
-                <!-- Responsive Navigation Menu -->
                 <div :class="{ 'block': showingNavigationDropdown, 'hidden': !showingNavigationDropdown }"
                     class="sm:hidden">
-                    <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
+                    <div class="pt-2 pb-3 space-y-1 font-droidkufi">
+                        <ResponsiveNavLink v-if="can('read dashboard')" :href="route('dashboard')"
+                            :active="route().current('dashboard')">
+                            داشبۆرد
                         </ResponsiveNavLink>
-                        <!-- <ResponsiveNavLink :href="route('permissions.create')"
-                            :active="route().current('permissions.create')">
-                            permissions
-                        </ResponsiveNavLink> -->
-                    </div>
 
-                    <!-- Responsive Settings Options -->
-                    <div class="pt-4 pb-1 border-t border-gray-200">
-                        <div class="flex items-center px-4">
-                            <div v-if="$page.props.jetstream.managesProfilePhotos" class="shrink-0 me-3">
-                                <img class="size-10 rounded-full object-cover"
-                                    :src="$page.props.auth.user.profile_photo_url" :alt="$page.props.auth.user.name">
-                            </div>
+                        <ResponsiveNavLink v-if="can('read users')" :href="route('users.index')"
+                            :active="route().current('users.index')">
+                            بەکارهێنەرەکان
+                        </ResponsiveNavLink>
 
-                            <div>
-                                <div class="font-medium text-base text-gray-800">
-                                    {{ $page.props.auth.user.name }}
-                                </div>
-                                <div class="font-medium text-sm text-gray-500">
-                                    {{ $page.props.auth.user.email }}
-                                </div>
-                            </div>
-                        </div>
+                        <ResponsiveNavLink v-if="can('read roles')" :href="route('roles.index')"
+                            :active="route().current('roles.index')">
+                            دەسەڵات
+                        </ResponsiveNavLink>
 
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.show')" :active="route().current('profile.show')">
-                                Profile
+                        <ResponsiveNavLink v-if="can('read projects')" :href="route('typemulk.index')"
+                            :active="route().current('typemulk.index')">
+                            جۆری موڵک
+                        </ResponsiveNavLink>
+                        <NavLink v-if="can('read projects')" :href="route('locations.index')"
+                            :active="route().current('locations.index')"
+                            :class="{ 'border-b-0 border-b-transparent ': route().current('locations.index') }">
+
+                            ناونیشان
+                        </NavLink>
+
+
+
+                        <ResponsiveNavLink v-if="can('read screenTwo')" :href="route('projects.index')"
+                            :active="route().current('projects.index')">
+                            مووڵکەکان
+                        </ResponsiveNavLink>
+
+                        <ResponsiveNavLink v-if="can('read darxsta')" :href="route('customers.index')"
+                            :active="route().current('customers.index')">
+                            کڕیارەکان
+                        </ResponsiveNavLink>
+
+                        <ResponsiveNavLink v-if="can('read roles')" :href="route('settings.index')"
+                            :active="route().current('settings.index')">
+                            ڕێکخستنەکان
+                        </ResponsiveNavLink>
+                        <!-- Authentication -->
+                        <form method="POST" @submit.prevent="logout">
+                            <ResponsiveNavLink class="text-danger" as="button">
+                                <h1 class="text-danger font-bold">
+                                    چوونەدەرەوە
+                                </h1>
                             </ResponsiveNavLink>
-
-                            <ResponsiveNavLink v-if="$page.props.jetstream.hasApiFeatures"
-                                :href="route('api-tokens.index')" :active="route().current('api-tokens.index')">
-                                API Tokens
-                            </ResponsiveNavLink>
-
-                            <!-- Authentication -->
-                            <form method="POST" @submit.prevent="logout">
-                                <ResponsiveNavLink as="button">
-                                    Log Out
-                                </ResponsiveNavLink>
-                            </form>
-
-                            <!-- Team Management -->
-                            <template v-if="$page.props.jetstream.hasTeamFeatures">
-                                <div class="border-t border-gray-200" />
-
-                                <div class="block px-4 py-2 text-xs text-gray-400">
-                                    Manage Team
-                                </div>
-
-                                <!-- Team Settings -->
-                                <ResponsiveNavLink :href="route('teams.show', $page.props.auth.user.current_team)"
-                                    :active="route().current('teams.show')">
-                                    Team Settings
-                                </ResponsiveNavLink>
-
-                                <ResponsiveNavLink v-if="$page.props.jetstream.canCreateTeams"
-                                    :href="route('teams.create')" :active="route().current('teams.create')">
-                                    Create New Team
-                                </ResponsiveNavLink>
-
-                                <!-- Team Switcher -->
-                                <template v-if="$page.props.auth.user.all_teams.length > 1">
-                                    <div class="border-t border-gray-200" />
-
-                                    <div class="block px-4 py-2 text-xs text-gray-400">
-                                        Switch Teams
-                                    </div>
-
-                                    <template v-for="team in $page.props.auth.user.all_teams" :key="team.id">
-                                        <form @submit.prevent="switchToTeam(team)">
-                                            <ResponsiveNavLink as="button">
-                                                <div class="flex items-center">
-                                                    <svg v-if="team.id == $page.props.auth.user.current_team_id"
-                                                        class="me-2 size-5 text-green-400"
-                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                    <div>{{ team.name }}</div>
-                                                </div>
-                                            </ResponsiveNavLink>
-                                        </form>
-                                    </template>
-                                </template>
-                            </template>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </nav>

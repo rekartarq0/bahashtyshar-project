@@ -11,9 +11,6 @@ dns.setDefaultResultOrder('verbatim');
 export default defineConfig({
   server: {
     host: '127.0.0.1',
-    // or use '0.0.0.0' with proper hmr.host override if exposing externally:
-    // host: '0.0.0.0',
-    // hmr: { host: '127.0.0.1' },
   },
   plugins: [
     AutoImport({ resolvers: [ElementPlusResolver()] }),

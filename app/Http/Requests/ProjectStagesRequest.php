@@ -22,10 +22,15 @@ class ProjectStagesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_id' => 'required|exists:projects,id',
-            'stage'      => 'required|in:Planning,Creative,Design,Sale',
+            'customer_id' => 'required|exists:customers,id',
+            'stage' => 'required|in:request,prepare,show,handling,contract',
+
             'start_time' => 'required|date',   // accepts any valid datetime
-            'end_time'   => 'nullable|date',   // accepts any valid datetime
+            'end_time' => 'nullable|date',   // accepts any valid datetime
+            'note' => 'nullable|string',   // accepts any valid datetime
+            'mulks' => 'nullable|array',
+            'mulks.*' => 'exists:mulks,id', // each mulk must exist in mulks table
+
         ];
     }
 }
