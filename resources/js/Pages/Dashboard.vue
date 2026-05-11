@@ -264,143 +264,261 @@
     </template>
   </el-dialog>
 
-  <!-- SHOW CUSTOMER DIALOG (unchanged structure, kept intact) -->
-  <el-dialog class="font-droidkufi" dir="rtl" v-model="dialogFormVisibleShow" title="وردەکاری کڕیار" width="70%"
-    :close-on-click-modal="true" @close="resetFormdata">
-    <div class="space-y-6">
-      <div class="md:flex gap-6">
-        <div class="w-full md:w-1/2">
-          <p class="text-sm font-bold text-gray-600">ناوی کڕیار</p>
-          <p class="text-base text-gray-900 flex items-center gap-2">
-            <span class="inline-block w-4 h-4 rounded-full border border-gray-300 shadow-sm"
-              :style="{ background: dataform.color ?? '#22c55e' }"></span>
-            {{ dataform.name }}
-          </p>
+ <!-- ══════════════════════════════════════
+       SHOW CUSTOMER DIALOG — Enhanced UI
+  ══════════════════════════════════════ -->
+ <el-dialog
+    class="font-droidkufi customer-show-dialog"
+    dir="rtl"
+    v-model="dialogFormVisibleShow"
+    width="72%"
+    :close-on-click-modal="true"
+    :show-close="false"
+    @close="resetFormdata"
+  >
+    <template #header>
+      <div class="dialog-header">
+        <div class="dialog-header-left">
+          <span class="customer-dot" :style="{ background: dataform.color ?? '#22c55e' }"></span>
+          <span class="dialog-title">وردەکاری کڕیار</span>
         </div>
-        <div class="w-full md:w-1/2">
-          <p class="text-sm font-bold text-gray-600">
-            ژمارەی تەلەفون
-            <el-button type="success" plain circle class="mr-2" @click="openWhatsApp">
-              <i class="fa-brands fa-whatsapp"></i>
-            </el-button>
-          </p>
-          <p class="text-base text-gray-900">{{ dataform.phone }}</p>
-        </div>
+        <button class="dialog-close-btn" @click="dialogFormVisibleShow = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
-
-      <div class="md:flex gap-6">
-        <div class="w-full md:w-1/2">
-          <p class="text-sm font-bold text-gray-600">جۆری موڵک</p>
-          <p class="text-base text-gray-900">{{ dataform.type_projects?.map(t => t.name).join('، ') }}</p>
-        </div>
-        <div class="w-full md:w-1/2">
-          <p class="text-sm font-bold text-gray-600">ناونیشان</p>
-          <p class="text-base text-gray-900">{{ dataform.locations?.map(l => l.name).join('، ') }}</p>
-        </div>
-      </div>
-
-      <div class="md:flex items-center justify-between">
-        <div class="md:w-1/2">
-          <p class="text-sm font-bold text-gray-600">نرخی سەرەتا</p>
-          <p class="text-base text-danger whitespace-pre-line">{{ commaNumber(dataform.price_one * 1) }} $</p>
-        </div>
-        <div class="md:w-1/2">
-          <p class="text-sm font-bold text-gray-600">نرخی کۆتایی</p>
-          <p class="text-base text-danger whitespace-pre-line">{{ commaNumber(dataform.price_two * 1) }} $</p>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between mt-4">
-        <div>
-          <p class="text-sm font-bold text-gray-600">تێبینی</p>
-          <p class="text-base text-gray-900">{{ dataform.note }}</p>
-        </div>
-      </div>
-
-      <div v-if="dataform.mulks && dataform.mulks.length" class="mb-2">
-        <p class="text-base font-bold text-gray-700">موڵکی هەڵبژێردراو</p>
-      </div>
-
-      <div v-if="dataform.mulks?.length" class="space-y-8">
-        <div v-for="(mulk, mulkIndex) in dataform.mulks" :key="mulk.id"
-          class="bg-white rounded-2xl border shadow-sm hover:shadow-xl transition overflow-hidden">
-          <div class="flex items-center gap-2 p-3">
-            <div class="bg-white px-4 py-2 rounded-xl shadow text-danger font-bold text-lg">
-              💰 {{ commaNumber(mulk.price) }}
-            </div>
-            <el-button type="danger" circle plain @click="removeMulk(mulk)">
-              <i class="fa-solid fa-xmark"></i>
-            </el-button>
+    </template>
+ 
+    <div class="show-dialog-body">
+ 
+      <!-- Row 1: Name & Phone -->
+      <div class="info-grid">
+        <div class="info-card">
+          <p class="info-label">ناوی کڕیار</p>
+          <div class="info-value-row">
+            <span class="color-dot" :style="{ background: dataform.color ?? '#22c55e' }"></span>
+            <span class="info-value">{{ dataform.name }}</span>
           </div>
-
-          <div class="bg-gradient-to-r from-gray-100 to-gray-50 p-5 flex justify-between items-center">
-            <div>
-              <h3 class="text-xl font-extrabold text-gray-800 flex items-center gap-2">🏠 {{ mulk.name }}</h3>
-              <p class="text-sm text-gray-500 mt-1">📍 {{ mulk.location?.name ?? '—' }}</p>
-            </div>
-            <div class="bg-white px-4 py-2 rounded-xl shadow text-danger font-bold text-lg">
-              💰 {{ commaNumber(mulk.price) }}
-            </div>
-          </div>
-
-          <div class="p-5 space-y-5">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div class="fact-box"><span>📐</span><p>{{ mulk.Rwbar }}</p><small>ڕوووبەر</small></div>
-              <div class="fact-box"><span>🏷</span><p>{{ mulk.type_project?.name ?? '—' }}</p><small>جۆری موڵک</small></div>
-              <div class="fact-box"><span>📍</span><p>{{ mulk.location?.name ?? '—' }}</p><small>شوێن</small></div>
-              <div class="fact-box">
-                <span>📞</span>
-                <p>{{ mulk.phone }}</p>
-                <small class="flex justify-center gap-2">
-                  تەلەفون
-                  <el-button type="success" plain circle size="small" @click="openWhatsAppmulks(mulk.phone)">
-                    <i class="fa-brands fa-whatsapp"></i>
-                  </el-button>
-                </small>
-              </div>
-            </div>
-
-            <div v-if="mulk.emara || mulk.qat || mulk.zhmarai_shwqa" class="flex flex-wrap gap-3">
-              <span v-if="mulk.emara" class="badge">🏢 عیمارە: {{ mulk.emara }}</span>
-              <span v-if="mulk.qat" class="badge">🏗 قات: {{ mulk.qat }}</span>
-              <span v-if="mulk.zhmarai_shwqa" class="badge">🚪 شووقە: {{ mulk.zhmarai_shwqa }}</span>
-            </div>
-
-            <div v-if="mulk.facebook_link" class="flex flex-wrap gap-3">
-              <a :href="mulk.facebook_link" target="_blank" rel="noopener noreferrer"
-                class="badge flex items-center gap-1 bg-blue-100 text-blue-700 hover:bg-blue-200 transition cursor-pointer">
-                📘 لینکی فەیسبووک
+        </div>
+ 
+        <div class="info-card">
+          <p class="info-label">پەیوەندی و تۆڕە کۆمەڵایەتییەکان</p>
+          <div class="info-value-row" style="justify-content: space-between; align-items: center;">
+            <span class="info-value ltr">{{ dataform.phone }}</span>
+            <div class="contact-button-group">
+              <a :href="'tel:' + dataform.phone" class="action-btn call-btn" title="پەیوەندی">
+                <i class="fa-solid fa-phone"></i>
+              </a>
+              <button class="action-btn wa-btn-new" @click="openWhatsApp" title="واتساپ">
+                <i class="fa-brands fa-whatsapp"></i>
+              </button>
+              <a :href="'https://t.me/' + dataform.phone" target="_blank" class="action-btn tg-btn" title="تێلیگرام">
+                <i class="fa-brands fa-telegram"></i>
+              </a>
+              <a :href="'viber://add?number=' + dataform.phone" class="action-btn vb-btn" title="ڤایبەر">
+                <i class="fa-brands fa-viber"></i>
               </a>
             </div>
-
-            <div class="badge md:col-span-2">📝 تێبینی: {{ mulk.note }}</div>
-            <div class="badge">
-              📍 شوێنی نەخشە:
-              <a :href="mulk.link_location" target="_blank" class="text-blue-600 underline">بینینی شوێن</a>
-            </div>
-
-            <div>
-              <p class="text-sm font-bold text-gray-600 mb-3">وێنەکان</p>
-              <div v-if="mulk.images?.length" class="flex gap-3 flex-wrap">
-                <div v-for="(img, imgIndex) in mulk.images" :key="img.id" class="relative group"
-                  style="width: 120px; height: 120px">
-                  <el-image :src="`/storage/${img.path}`" :preview-src-list="mulk.images.map(i => `/storage/${i.path}`)"
-                    fit="cover" show-progress style="width: 100%; height: 100%; border-radius: 0.5rem;">
-                  </el-image>
-                  <el-button size="mini" type="danger"
-                    class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                    @click="printImage(mulkIndex, imgIndex)">
-                    <i class="fa-solid fa-print"></i>
-                  </el-button>
-                </div>
-              </div>
-              <p v-else class="text-gray-400 text-sm">وێنە نییە</p>
-            </div>
           </div>
         </div>
       </div>
-      <p v-else class="text-center text-gray-400 text-sm">موڵک نییە</p>
+ 
+      <!-- Row 2: Type & Location -->
+      <div class="info-grid">
+        <div class="info-card">
+          <p class="info-label">جۆری موڵک</p>
+          <div class="badge-row">
+            <span v-for="t in dataform.type_projects" :key="t.id" class="badge badge-purple">{{ t.name }}</span>
+          </div>
+        </div>
+        <div class="info-card">
+          <p class="info-label">ناونیشان</p>
+          <div class="badge-row">
+            <span v-for="l in dataform.locations" :key="l.id" class="badge badge-green">{{ l.name }}</span>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Row 3: Prices -->
+      <div class="info-grid">
+        <div class="info-card price-card">
+          <p class="info-label">نرخی سەرەتا</p>
+          <p class="price-value">{{ commaNumber(dataform.price_one * 1) }} $</p>
+        </div>
+        <div class="info-card price-card">
+          <p class="info-label">نرخی کۆتایی</p>
+          <p class="price-value">{{ commaNumber(dataform.price_two * 1) }} $</p>
+        </div>
+      </div>
+ 
+      <!-- Note -->
+      <div v-if="dataform.note" class="note-card">
+        <p class="info-label note-label">تێبینی</p>
+        <p class="note-text">{{ dataform.note }}</p>
+      </div>
+ 
+      <!-- Mulks Section -->
+      <div v-if="dataform.mulks?.length">
+        <div class="section-header">
+          <p class="section-title">موڵکی هەڵبژێردراو</p>
+          <span class="count-badge">{{ dataform.mulks.length }} موڵک</span>
+        </div>
+ 
+        <div class="mulk-list">
+          <div
+            v-for="(mulk, mulkIndex) in dataform.mulks"
+            :key="mulk.id"
+            class="mulk-card"
+          >
+            <!-- Mulk Card Header with blur-reveal on name -->
+            <div class="mulk-card-header">
+              <div class="mulk-header-left">
+                <!-- Blurred name — click to reveal -->
+                <span
+                  class="mulk-name reveal-text"
+                  :class="{ revealed: revealedNames.has(mulk.id) }"
+                  @click="toggleReveal(revealedNames, mulk.id)"
+                  :title="revealedNames.has(mulk.id) ? '' : 'کلیک بکە بۆ دیتن'"
+                >{{ mulk.name }}</span>
+ 
+                <span
+                  v-if="!revealedNames.has(mulk.id)"
+                  class="reveal-hint"
+                  @click="toggleReveal(revealedNames, mulk.id)"
+                >
+                  <i class="fa-solid fa-eye"></i> کلیک بکە
+                </span>
+ 
+                <span class="badge badge-purple" style="font-size: 11px;">
+                  <i class="fa-solid fa-tag mr-1"></i>
+                  {{ mulk.type_project?.name ?? '—' }}
+                </span>
+              </div>
+              <div class="mulk-header-right">
+                <span class="mulk-price">{{ commaNumber(mulk.price) }} $</span>
+                <button class="remove-btn" @click="removeMulk(mulk)">
+                  <i class="fa-solid fa-trash-can"></i>
+                  سڕینەوە
+                </button>
+              </div>
+            </div>
+ 
+            <!-- Mulk Stats Grid -->
+            <div class="mulk-stats">
+              <div class="stat-cell">
+                <p class="stat-label"><i class="fa-solid fa-ruler-combined"></i> ڕووبەر</p>
+                <p class="stat-value">{{ mulk.Rwbar }}</p>
+              </div>
+              <div class="stat-cell stat-divider">
+                <p class="stat-label"><i class="fa-solid fa-building"></i> جۆری موڵک</p>
+                <p class="stat-value">{{ mulk.type_project?.name ?? '—' }}</p>
+              </div>
+              <div class="stat-cell stat-divider">
+                <p class="stat-label"><i class="fa-solid fa-location-dot"></i> شوێن</p>
+                <p class="stat-value">{{ mulk.location?.name ?? '—' }}</p>
+              </div>
+              <div class="stat-cell stat-divider">
+                <p class="stat-label"><i class="fa-solid fa-address-book"></i> پەیوەندی</p>
+                <div class="contact-actions">
+                  <!-- Blurred phone — click to reveal -->
+                  <div class="phone-reveal-row">
+                    <span
+                      class="stat-value ltr reveal-text"
+                      :class="{ revealed: revealedPhones.has(mulk.id) }"
+                      @click="toggleReveal(revealedPhones, mulk.id)"
+                      :title="revealedPhones.has(mulk.id) ? '' : 'کلیک بکە بۆ دیتنی ژمارە'"
+                    >{{ mulk.phone }}</span>
+                    <button
+                      v-if="!revealedPhones.has(mulk.id)"
+                      class="reveal-phone-btn"
+                      @click="toggleReveal(revealedPhones, mulk.id)"
+                    >
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                  </div>
+ 
+                  <!-- Contact icons — only show when phone is revealed -->
+                  <transition name="fade-slide">
+                    <div v-if="revealedPhones.has(mulk.id)" class="flex gap-2 mt-1">
+                      <a :href="'tel:' + mulk.phone" class="contact-icon call" title="Call">
+                        <i class="fa-solid fa-phone"></i>
+                      </a>
+                      <button class="contact-icon whatsapp" @click="openWhatsAppmulks(mulk.phone)" title="WhatsApp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                      </button>
+                      <a :href="'https://t.me/' + mulk.phone" target="_blank" class="contact-icon telegram" title="Telegram">
+                        <i class="fa-brands fa-telegram"></i>
+                      </a>
+                      <a :href="'viber://add?number=' + mulk.phone" class="contact-icon viber" title="Viber">
+                        <i class="fa-brands fa-viber"></i>
+                      </a>
+                    </div>
+                  </transition>
+                </div>
+              </div>
+            </div>
+ 
+            <!-- Mulk Badges -->
+            <div
+              v-if="mulk.emara || mulk.qat || mulk.zhmarai_shwqa || mulk.facebook_link || mulk.link_location"
+              class="mulk-badges"
+            >
+              <span v-if="mulk.emara" class="badge badge-neutral"><i class="fa-solid fa-hotel mr-1"></i> عیمارە: {{ mulk.emara }}</span>
+              <span v-if="mulk.qat" class="badge badge-neutral"><i class="fa-solid fa-layer-group mr-1"></i> قات: {{ mulk.qat }}</span>
+              <span v-if="mulk.zhmarai_shwqa" class="badge badge-neutral"><i class="fa-solid fa-door-open mr-1"></i> شووقە: {{ mulk.zhmarai_shwqa }}</span>
+              <a v-if="mulk.facebook_link" :href="mulk.facebook_link" target="_blank" class="badge badge-blue">
+                <i class="fa-brands fa-facebook mr-1"></i> فەیسبووک
+              </a>
+              <a v-if="mulk.link_location" :href="mulk.link_location" target="_blank" class="badge badge-teal">
+                <i class="fa-solid fa-map-location-dot mr-1"></i> بینینی شوێن
+              </a>
+            </div>
+ 
+            <!-- Mulk Note + Images -->
+            <div class="mulk-bottom">
+              <div v-if="mulk.note" class="mulk-note">
+                <p class="info-label" style="margin-bottom: 4px;">تێبینی</p>
+                <p class="note-text" style="margin: 0;">{{ mulk.note }}</p>
+              </div>
+              <div class="mulk-images">
+                <p class="info-label" style="margin-bottom: 8px;">وێنەکان</p>
+                <div v-if="mulk.images?.length" class="images-row">
+                  <div
+                    v-for="(img, imgIndex) in mulk.images"
+                    :key="img.id"
+                    class="img-thumb-wrap group"
+                  >
+                    <el-image
+                      :src="`/storage/${img.path}`"
+                      :preview-src-list="mulk.images.map(i => `/storage/${i.path}`)"
+                      fit="cover"
+                      class="img-thumb"
+                    />
+                    <button class="print-btn" @click="printImage(mulkIndex, imgIndex)">
+                      <i class="fa-solid fa-print"></i>
+                    </button>
+                  </div>
+                </div>
+                <p v-else class="empty-text">وێنە نییە</p>
+              </div>
+            </div>
+ 
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Empty state -->
+      <div v-else class="empty-mulks">
+        <i class="fa-regular fa-folder-open" style="font-size: 28px; color: #d1d5db; display: block; margin-bottom: 8px;"></i>
+        موڵک نییە
+      </div>
+ 
     </div>
+ 
+    <template #footer>
+      <div class="dialog-footer">
+        <button class="footer-close-btn" @click="dialogFormVisibleShow = false">داخستن</button>
+      </div>
+    </template>
   </el-dialog>
 
   <!-- Back Stage Dialog -->
@@ -504,6 +622,16 @@ const props = defineProps({ data: Object });
 const ErrorForms = ref({});
 const dataform = reactive({});
 
+
+
+const revealedNames  = reactive(new Set())
+const revealedPhones = reactive(new Set())
+ 
+function toggleReveal(set, id) {
+  if (set.has(id)) set.delete(id)
+  else set.add(id)
+}
+
 // ─── Preset colors (the palette) ─────────────────────
 const colorPresets = [
   { label: 'سەوز',        value: '#22c55e' },
@@ -521,29 +649,31 @@ const colorPresets = [
   { label: 'قاوەیی',      value: '#92400e' },
   { label: 'ڕەش',         value: '#111827' },
 ];
-
-// ─── WhatsApp helpers ─────────────────────────────────
+ 
+// ─── WhatsApp ─────────────────────────────────────────
 function openWhatsApp() {
-  let phone = dataform.phone.replace(/\D/g, '');
-  if (phone.startsWith('0')) phone = phone.slice(1);
-  if (!phone.startsWith('964')) phone = '964' + phone;
-  window.open(`https://wa.me/${phone}`, '_blank');
+  let phone = dataform.phone.replace(/\D/g, '')
+  if (phone.startsWith('0')) phone = phone.slice(1)
+  if (!phone.startsWith('964')) phone = '964' + phone
+  window.open(`https://wa.me/${phone}`, '_blank')
 }
-const openWhatsAppmulks = (phone) => {
-  if (!phone) return;
-  phone = phone.replace(/\D/g, '');
-  if (phone.startsWith('0')) phone = phone.slice(1);
-  if (!phone.startsWith('964')) phone = '964' + phone;
-  window.open(`https://wa.me/${phone}`, '_blank');
-};
+ 
+function openWhatsAppmulks(phone) {
+  if (!phone) return
+  phone = phone.replace(/\D/g, '')
+  if (phone.startsWith('0')) phone = phone.slice(1)
+  if (!phone.startsWith('964')) phone = '964' + phone
+  window.open(`https://wa.me/${phone}`, '_blank')
+}
 
-// ─── Print image ──────────────────────────────────────
-const printImage = (mulkIndex, imgIndex) => {
-  const mulk = dataform.mulks[mulkIndex];
-  if (!mulk?.images?.[imgIndex]) return;
-  const imgSrc = `/storage/${mulk.images[imgIndex].path}`;
-  const templateSrc = '/assets/images/A4templateimg.jpg';
-  const printWindow = window.open('', '_blank', 'width=900,height=1200');
+ 
+// ─── Print image ─────────────────────────────────────
+function printImage(mulkIndex, imgIndex) {
+  const mulk = dataform.mulks[mulkIndex]
+  if (!mulk?.images?.[imgIndex]) return
+  const imgSrc = `/storage/${mulk.images[imgIndex].path}`
+  const templateSrc = '/assets/images/A4templateimg.jpg'
+  const printWindow = window.open('', '_blank', 'width=900,height=1200')
   printWindow.document.write(`
     <html><head><title>Print Image</title>
     <style>
@@ -553,11 +683,12 @@ const printImage = (mulkIndex, imgIndex) => {
         display:flex;justify-content:center;align-items:center}
       img{max-width:180mm;max-height:250mm;object-fit:contain}
     </style></head>
-    <body><img src="${imgSrc}" /></body></html>`);
-  printWindow.document.close();
-  printWindow.focus();
-  printWindow.onload = () => { printWindow.print(); printWindow.close(); };
-};
+    <body><img src="${imgSrc}" /></body></html>`)
+  printWindow.document.close()
+  printWindow.focus()
+  printWindow.onload = () => { printWindow.print(); printWindow.close() }
+}
+ 
 
 // ─── Back-to-design state ─────────────────────────────
 const dialogFormVisibleBackToDesign = ref(false);
@@ -613,16 +744,19 @@ function BackToStageSubmit() {
 // ─── Remove mulk ─────────────────────────────────────
 function removeMulk(mulk) {
   ElMessageBox.confirm('دڵنیایت لە سڕینەوەی ئەم موڵکە؟', 'سڕینەوە', {
-    confirmButtonText: 'بەڵێ', cancelButtonText: 'نەخێر', type: 'warning', customClass: 'custom-confirm-box',
+    confirmButtonText: 'بەڵێ',
+    cancelButtonText: 'نەخێر',
+    type: 'warning',
+    customClass: 'custom-confirm-box',
   }).then(() => {
     router.delete(route('customers.mulks.detach', [mulk.pivot.customer_id, mulk.id]), {
       preserveScroll: true,
       onSuccess: () => {
-        ElMessage.success('سڕایەوە بە سەرکەوتوویی');
-        router.visit('/dashboard', { preserveScroll: true });
+        ElMessage.success('سڕایەوە بە سەرکەوتوویی')
+        router.visit('/dashboard', { preserveScroll: true })
       },
-    });
-  });
+    })
+  })
 }
 
 // ─── Complete pricing ─────────────────────────────────
@@ -667,36 +801,31 @@ const mulksByStage = computed(() => {
 const dialogFormVisible = ref(false);
 const dialogFormVisibleShow = ref(false);
 
-// ─── Show customer ─────────────────────────────────────
+// ─── Open dialog ──────────────────────────────────────
 function show(id) {
   router.get(`customers/${id}`, {}, {
-    preserveState: true, preserveScroll: true,
+    preserveState: true,
+    preserveScroll: true,
     onSuccess: (result) => {
-      const mulk = result.props.flash?.data;
-      if (!mulk) return;
-      Object.keys(dataform).forEach(k => delete dataform[k]);
-      Object.assign(dataform, mulk);
-      dataform.type_projects = mulk.type_projects || [];
-      dataform.locations = mulk.locations || [];
-      dataform.desgin_img = mulk.images?.map(img => img.path) || [];
-      dataform.type_project_name = mulk.type_project?.name || '';
-      dataform.location_name = mulk.location?.name || '';
-      dataform.name = mulk.name ?? '';
-      dataform.phone = mulk.phone ?? '';
-      dataform.note = mulk.note ?? '';
-      dataform.price = mulk.price ?? '';
-      dataform.Rwbar = mulk.Rwbar ?? '';
-      dataform.color = mulk.color ?? '#22c55e';
-      dialogFormVisibleShow.value = true;
+      const mulk = result.props.flash?.data
+      if (!mulk) return
+      Object.keys(dataform).forEach(k => delete dataform[k])
+      Object.assign(dataform, mulk)
+      dataform.type_projects = mulk.type_projects || []
+      dataform.locations = mulk.locations || []
+      dataform.color = mulk.color ?? '#22c55e'
+      dialogFormVisibleShow.value = true
     },
-    onError: (errors) => console.error('Failed to load:', errors),
-  });
+  })
 }
 
-const resetFormdata = () => {
-  Object.keys(dataform).forEach(key => delete dataform[key]);
-  dialogFormVisibleShow.value = false;
-};
+// ─── Reset ────────────────────────────────────────────
+function resetFormdata() {
+  Object.keys(dataform).forEach(key => delete dataform[key])
+  dialogFormVisibleShow.value = false
+   revealedNames.clear()
+   revealedPhones.clear()
+}
 
 // ─── Mulk select dialog ────────────────────────────────
 const dialogDesignerVisible = ref(false);
@@ -981,4 +1110,793 @@ function archiveProject(item) {
     background-size: cover;
   }
 }
+
+/* ─── Dialog Shell ───────────────────────────────────── */
+:deep(.customer-show-dialog .el-dialog__header) {
+  padding: 0;
+  margin-bottom: 0;
+}
+:deep(.customer-show-dialog .el-dialog__body) {
+  padding: 0;
+}
+:deep(.customer-show-dialog .el-dialog__footer) {
+  padding: 0;
+}
+ 
+/* ─── Header ─────────────────────────────────────────── */
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 0.5px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 12px 12px 0 0;
+}
+.dialog-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.customer-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dialog-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+.dialog-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #d91313;
+  font-size: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.dialog-close-btn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+
+/* ─── Blur / Reveal ──────────────────────────────────────────────── */
+.reveal-text {
+  filter: blur(5px);
+  cursor: pointer;
+  user-select: none;
+  transition: filter 0.35s ease;
+  border-radius: 4px;
+  padding: 1px 4px;
+  position: relative;
+}
+.reveal-text:hover {
+  filter: blur(3px);
+  background: rgba(99, 153, 34, 0.06);
+}
+.reveal-text.revealed {
+  filter: none;
+  cursor: default;
+  background: transparent;
+}
+ 
+/* Hint badge that appears next to blurred name */
+.reveal-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #f0fdf4;
+  border: 0.5px solid #86efac;
+  color: #16a34a;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.reveal-hint:hover {
+  background: #dcfce7;
+}
+ 
+/* Phone reveal row */
+.phone-reveal-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.reveal-phone-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 0.5px solid #d1d5db;
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.reveal-phone-btn:hover {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #16a34a;
+}
+ 
+/* Fade-slide transition for contact icons appearing */
+.fade-slide-enter-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+.fade-slide-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+ 
+/* ─── Dialog Shell ───────────────────────────────────────────────── */
+:deep(.customer-show-dialog .el-dialog__header) { padding: 0; margin-bottom: 0; }
+:deep(.customer-show-dialog .el-dialog__body)   { padding: 0; }
+:deep(.customer-show-dialog .el-dialog__footer) { padding: 0; }
+ 
+/* ─── Header ─────────────────────────────────────────────────────── */
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 0.5px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 12px 12px 0 0;
+}
+.dialog-header-left { display: flex; align-items: center; gap: 10px; }
+.customer-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+.dialog-title { font-size: 16px; font-weight: 600; color: #111827; }
+.dialog-close-btn {
+  background: none; border: none; cursor: pointer; color: #d91313;
+  font-size: 16px; width: 30px; height: 30px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; transition: background 0.15s;
+}
+.dialog-close-btn:hover { background: #f3f4f6; color: #111827; }
+ 
+/* ─── Body ───────────────────────────────────────────────────────── */
+.show-dialog-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  max-height: 78vh;
+  overflow-y: auto;
+}
+.show-dialog-body::-webkit-scrollbar { width: 5px; }
+.show-dialog-body::-webkit-scrollbar-track { background: transparent; }
+.show-dialog-body::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+ 
+/* ─── Info Cards ─────────────────────────────────────────────────── */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.info-card { background: #f9fafb; border-radius: 10px; padding: 0.75rem 1rem; border: 0.5px solid #e5e7eb; }
+.info-label { font-size: 11px; font-weight: 600; color: #9ca3af; margin: 0 0 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+.info-value-row { display: flex; align-items: center; gap: 8px; }
+.color-dot {
+  display: inline-block; width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,0.5); box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+}
+.info-value { font-size: 15px; font-weight: 500; color: #111827; }
+.ltr { direction: ltr; }
+ 
+/* ─── Badges ─────────────────────────────────────────────────────── */
+.badge-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge { font-size: 12px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+.badge-purple { background: #ede9fe; color: #5b21b6; border: 0.5px solid #c4b5fd; }
+.badge-green  { background: #ecfdf5; color: #065f46; border: 0.5px solid #6ee7b7; }
+.badge-blue   { background: #eff6ff; color: #1d4ed8; border: 0.5px solid #93c5fd; text-decoration: none; }
+.badge-teal   { background: #f0fdfa; color: #0f766e; border: 0.5px solid #5eead4; text-decoration: none; }
+.badge-neutral{ background: #f9fafb; color: #4b5563; border: 0.5px solid #e5e7eb; }
+ 
+/* ─── Price Cards ────────────────────────────────────────────────── */
+.price-card { border-left: 3px solid #fca5a5; }
+.price-value { font-size: 20px; font-weight: 600; color: #b91c1c; margin: 0; direction: ltr; }
+ 
+/* ─── Note ───────────────────────────────────────────────────────── */
+.note-card { background: #fffbeb; border: 0.5px solid #fde68a; border-radius: 10px; padding: 0.75rem 1rem; }
+.note-label { color: #92400e; }
+.note-text { font-size: 14px; color: #78350f; margin: 0; line-height: 1.65; }
+ 
+/* ─── Section Header ─────────────────────────────────────────────── */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+.section-title { font-size: 14px; font-weight: 600; color: #111827; margin: 0; }
+.count-badge { font-size: 12px; background: #f3f4f6; border: 0.5px solid #e5e7eb; padding: 3px 10px; border-radius: 20px; color: #3eb131; }
+ 
+/* ─── Mulk Cards ─────────────────────────────────────────────────── */
+.mulk-list { display: flex; flex-direction: column; gap: 0.875rem; }
+.mulk-card { border: 0.5px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: #fff; transition: box-shadow 0.2s; }
+.mulk-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+ 
+.mulk-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1rem; background: #f9fafb; border-bottom: 0.5px solid #e5e7eb;
+}
+.mulk-header-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.mulk-name { font-size: 14px; font-weight: 600; color: #111827; }
+.mulk-header-right { display: flex; align-items: center; gap: 10px; }
+.mulk-price { font-size: 15px; font-weight: 600; color: #b91c1c; }
+.remove-btn {
+  display: inline-flex; align-items: center; gap: 4px; background: none;
+  border: 0.5px solid #fca5a5; border-radius: 8px; color: #dc2626;
+  padding: 3px 10px; font-size: 12px; cursor: pointer; font-family: inherit; transition: background 0.15s;
+}
+.remove-btn:hover { background: #fef2f2; }
+ 
+/* ─── Stats Grid ─────────────────────────────────────────────────── */
+.mulk-stats { display: grid; grid-template-columns: repeat(4, 1fr); padding: 0.875rem 1rem; border-bottom: 0.5px solid #e5e7eb; }
+.stat-cell { text-align: center; }
+.stat-divider { border-right: 0.5px solid #e5e7eb; }
+.stat-label { font-size: 11px; color: #9ca3af; margin: 0 0 3px; font-weight: 500; }
+.stat-label i { margin-left: 4px; color: #6b7280; font-size: 12px; }
+.stat-value { font-size: 13px; font-weight: 500; color: #111827; margin: 0; }
+ 
+/* ─── Contact Actions (inside stat cell) ────────────────────────── */
+.contact-actions { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.contact-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 6px; color: white;
+  font-size: 14px; transition: transform 0.2s; cursor: pointer;
+  border: none; text-decoration: none;
+}
+.contact-icon:hover { transform: scale(1.15); }
+.contact-icon.call      { background-color: #3b82f6; }
+.contact-icon.whatsapp  { background-color: #25D366; }
+.contact-icon.telegram  { background-color: #0088cc; }
+.contact-icon.viber     { background-color: #7360f2; }
+ 
+/* ─── Customer contact buttons ───────────────────────────────────── */
+.contact-button-group { display: flex; gap: 8px; align-items: center; }
+.action-btn {
+  display: flex; justify-content: center; align-items: center;
+  width: 32px; height: 32px; border-radius: 8px; color: white;
+  text-decoration: none; transition: all 0.2s ease; border: none; cursor: pointer; font-size: 16px;
+}
+.action-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+.call-btn   { background-color: #3b82f6; }
+.wa-btn-new { background-color: #25D366; }
+.tg-btn     { background-color: #0088cc; }
+.vb-btn     { background-color: #7360f2; }
+ 
+/* ─── Mulk Badges Row ────────────────────────────────────────────── */
+.mulk-badges { display: flex; gap: 6px; flex-wrap: wrap; padding: 0.625rem 1rem; border-bottom: 0.5px solid #e5e7eb; }
+ 
+/* ─── Mulk Bottom ────────────────────────────────────────────────── */
+.mulk-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0.875rem 1rem; }
+.images-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.img-thumb-wrap { position: relative; width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 0.5px solid #e5e7eb; }
+.img-thumb { width: 100%; height: 100%; object-fit: cover; }
+.print-btn {
+  position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.55); border: none;
+  border-radius: 6px; color: #fff; width: 24px; height: 24px; display: flex;
+  align-items: center; justify-content: center; cursor: pointer; font-size: 11px;
+  opacity: 0; transition: opacity 0.15s;
+}
+.img-thumb-wrap:hover .print-btn { opacity: 1; }
+ 
+/* ─── Empty States ───────────────────────────────────────────────── */
+.empty-text { font-size: 13px; color: #9ca3af; margin: 0; }
+.empty-mulks { text-align: center; padding: 2rem 0; font-size: 13px; color: #9ca3af; }
+ 
+/* ─── Footer ─────────────────────────────────────────────────────── */
+.dialog-footer {
+  display: flex; justify-content: flex-end;
+  padding: 0.75rem 1.25rem; border-top: 0.5px solid #e5e7eb;
+  background: #f9fafb; border-radius: 0 0 12px 12px;
+}
+.footer-close-btn {
+  padding: 7px 20px; border-radius: 8px; border: 0.5px solid #d1d5db;
+  background: #fff; color: #d91313; font-size: 13px; cursor: pointer;
+  font-family: inherit; transition: background 0.15s;
+}
+.footer-close-btn:hover { background: #f3f4f6; }
+ 
+/* ─── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .info-grid, .mulk-stats, .mulk-bottom { grid-template-columns: 1fr; }
+  .stat-divider { border-right: none; border-top: 0.5px solid #e5e7eb; }
+}
+ 
+@media print {
+  body * { visibility: hidden; }
+  .print-container, .print-container * { visibility: visible; }
+  .print-container {
+    position: absolute; left: 0; top: 0; display: block;
+    width: 210mm; height: 297mm; margin: 0 auto;
+    background: url('/assets/images/A4template.jpg') no-repeat center center;
+    background-size: cover;
+  }
+}
+ 
+/* ─── Body ───────────────────────────────────────────── */
+.show-dialog-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  max-height: 78vh;
+  overflow-y: auto;
+}
+ 
+/* ─── Info Cards ─────────────────────────────────────── */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.info-card {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  border: 0.5px solid #e5e7eb;
+}
+.info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  margin: 0 0 6px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.info-value-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.color-dot {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,0.5);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+}
+.info-value {
+  font-size: 15px;
+  font-weight: 500;
+  color: #111827;
+}
+.ltr {
+  direction: ltr;
+}
+ 
+/* ─── WhatsApp Button ────────────────────────────────── */
+.wa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0fdf4;
+  border: 0.5px solid #86efac;
+  color: #16a34a;
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.wa-btn:hover {
+  background: #dcfce7;
+}
+.wa-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #16a34a;
+  font-size: 14px;
+  padding: 0 2px;
+}
+ 
+/* ─── Badges ─────────────────────────────────────────── */
+.badge-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.badge {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.badge-purple {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 0.5px solid #c4b5fd;
+}
+.badge-green {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 0.5px solid #6ee7b7;
+}
+.badge-blue {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 0.5px solid #93c5fd;
+  text-decoration: none;
+}
+.badge-teal {
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 0.5px solid #5eead4;
+  text-decoration: none;
+}
+.badge-neutral {
+  background: #f9fafb;
+  color: #4b5563;
+  border: 0.5px solid #e5e7eb;
+}
+ 
+/* ─── Price Cards ────────────────────────────────────── */
+.price-card {
+  border-left: 3px solid #fca5a5;
+}
+.price-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #b91c1c;
+  margin: 0;
+  direction: ltr;
+}
+ 
+/* ─── Note ───────────────────────────────────────────── */
+.note-card {
+  background: #fffbeb;
+  border: 0.5px solid #fde68a;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+.note-label {
+  color: #92400e;
+}
+.note-text {
+  font-size: 14px;
+  color: #78350f;
+  margin: 0;
+  line-height: 1.65;
+}
+ 
+/* ─── Section Header ─────────────────────────────────── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+.count-badge {
+  font-size: 12px;
+  background: #f3f4f6;
+  border: 0.5px solid #e5e7eb;
+  padding: 3px 10px;
+  border-radius: 20px;
+  color: #3eb131;
+}
+ 
+/* ─── Mulk Cards ─────────────────────────────────────── */
+.mulk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.mulk-card {
+  border: 0.5px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  transition: box-shadow 0.2s;
+}
+.mulk-card:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+.mulk-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-bottom: 0.5px solid #e5e7eb;
+}
+.mulk-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mulk-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+.mulk-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mulk-price {
+  font-size: 15px;
+  font-weight: 600;
+  color: #b91c1c;
+}
+.remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 0.5px solid #fca5a5;
+  border-radius: 8px;
+  color: #dc2626;
+  padding: 3px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.remove-btn:hover {
+  background: #fef2f2;
+}
+ 
+/* ─── Stats Grid ─────────────────────────────────────── */
+.mulk-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0.875rem 1rem;
+  border-bottom: 0.5px solid #e5e7eb;
+}
+.stat-cell {
+  text-align: center;
+}
+.stat-divider {
+  border-right: 0.5px solid #e5e7eb;
+}
+.stat-label {
+  font-size: 11px;
+  color: #9ca3af;
+  margin: 0 0 3px;
+  font-weight: 500;
+}
+.stat-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+  margin: 0;
+}
+.stat-phone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+ 
+/* ─── Mulk Badges Row ────────────────────────────────── */
+.mulk-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 0.625rem 1rem;
+  border-bottom: 0.5px solid #e5e7eb;
+}
+ 
+/* ─── Mulk Bottom ────────────────────────────────────── */
+.mulk-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+}
+.mulk-note {
+  /* inherits */
+}
+.mulk-images {
+  /* inherits */
+}
+.images-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.img-thumb-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 0.5px solid #e5e7eb;
+}
+.img-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.print-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0,0,0,0.55);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.img-thumb-wrap:hover .print-btn {
+  opacity: 1;
+}
+ 
+/* ─── Empty States ───────────────────────────────────── */
+.empty-text {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0;
+}
+.empty-mulks {
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 13px;
+  color: #9ca3af;
+}
+ 
+/* ─── Footer ─────────────────────────────────────────── */
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem 1.25rem;
+  border-top: 0.5px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 0 0 12px 12px;
+}
+.footer-close-btn {
+  padding: 7px 20px;
+  border-radius: 8px;
+  border: 0.5px solid #d1d5db;
+  background: #fff;
+  color: #d91313;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.footer-close-btn:hover {
+  background: #f3f4f6;
+}
+ 
+/* ─── Scrollbar ──────────────────────────────────────── */
+.show-dialog-body::-webkit-scrollbar {
+  width: 5px;
+}
+.show-dialog-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.show-dialog-body::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+ 
+/* ─── Responsive ─────────────────────────────────────── */
+@media (max-width: 640px) {
+  .info-grid,
+  .mulk-stats,
+  .mulk-bottom {
+    grid-template-columns: 1fr;
+  }
+  .stat-divider {
+    border-right: none;
+    border-top: 0.5px solid #e5e7eb;
+  }
+}
+
+
+
+/* Styling for the new communication buttons */
+.contact-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contact-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  transition: transform 0.2s;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.contact-icon:hover {
+  transform: scale(1.15);
+}
+
+.contact-icon.call { background-color: #3b82f6; } /* Blue */
+.contact-icon.whatsapp { background-color: #25D366; } /* Green */
+.contact-icon.telegram { background-color: #0088cc; } /* Sky Blue */
+.contact-icon.viber { background-color: #7360f2; } /* Purple */
+
+.stat-label i {
+  margin-left: 4px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.ltr {
+  direction: ltr;
+}
+
+
+/* Container for the row of buttons */
+.contact-button-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Base style for small circle action buttons */
+.action-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Brand Colors */
+.call-btn { background-color: #3b82f6; } /* Phone Blue */
+.wa-btn-new { background-color: #25D366; } /* WhatsApp Green */
+.tg-btn { background-color: #0088cc; }   /* Telegram Blue */
+.vb-btn { background-color: #7360f2; }   /* Viber Purple */
+
+/* Ensure LTR for phone numbers */
+.ltr {
+  direction: ltr;
+  font-family: sans-serif;
+}
+
 </style>

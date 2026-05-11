@@ -47,10 +47,25 @@ class InvoiceNormal extends Model
         'shahid_two',
 
         'date_invoice',
+
+
+
+          // ✅ ADD THESE
+    'emara',
+    'qat',
+    'zhmarai_shwqa',
+
+
+    // add new fields
+    'phone_one_shahid',
+    'phone_two_shahid',
+    'zhmarai_rozhi_cholkrdn',
+    'krey_mangana_currency',
+    'mawai_katy_cholkrdn'
     ];
 
     protected $casts = [
-        'date_invoice' => 'date',
+    'date_invoice' => 'date:Y-m-d',  // ← add the format
     ];
 
     public function user()

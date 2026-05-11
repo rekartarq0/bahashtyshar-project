@@ -38,7 +38,7 @@
       <div class="dashboard-container">
 
         <!-- KPI Strip -->
-        <div class="kpi-strip">
+        <div class="kpi-strip page-enter" style="--delay:0ms">
           <div class="kpi-card" v-for="kpi in kpiCards" :key="kpi.label">
             <div class="kpi-icon" :class="kpi.color">
               <span v-html="kpi.icon"></span>
@@ -51,7 +51,7 @@
         </div>
 
         <!-- Filter Bar -->
-        <div class="filter-bar">
+        <div class="filter-bar page-enter" style="--delay:80ms">
           <div class="filter-row">
             <div class="search-wrap">
               <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,22 +117,57 @@
               <button v-if="searchText" @click="searchText=''" class="filter-chip">🔍 {{ searchText }} ×</button>
               <button v-if="filterType.length" @click="filterType=[]" class="filter-chip">جۆر ({{ filterType.length }}) ×</button>
               <button v-if="filterLocation.length" @click="filterLocation=[]" class="filter-chip">شوێن ({{ filterLocation.length }}) ×</button>
+              <!-- ✅ NEW: show active stage filter chip -->
+              <button v-if="stageFilter" @click="stageFilter=null" class="filter-chip" :style="{ background: STAGE_COLORS[stageFilter] + '22', color: STAGE_COLORS[stageFilter], borderColor: STAGE_COLORS[stageFilter] + '55' }">
+                {{ STAGE_EMOJI[stageFilter] }} {{ stageLabel(stageFilter) }} ×
+              </button>
               <button @click="clearAllFilters" class="filter-chip danger">پاک کردنەوەی هەموو ×</button>
             </div>
           </transition>
         </div>
 
-        <!-- Stage Legend -->
-        <div class="stage-legend">
-          <span v-for="s in STAGE_ORDER" :key="s" class="stage-pill" :style="{ background: STAGE_COLORS[s] }">
+        <!-- ✅ UPDATED: Stage Legend — now clickable filter buttons -->
+        <div class="stage-legend page-enter" style="--delay:140ms">
+          <!-- All button -->
+          <button
+            class="stage-pill stage-pill-btn"
+            :class="{ 'stage-pill-active': stageFilter === null, 'stage-pill-inactive': stageFilter !== null }"
+            :style="stageFilter === null ? { background: '#1e293b', borderColor: '#1e293b', color: '#fff' } : {}"
+            @click="stageFilter = null"
+          >
+            <span>🏠</span>
+            هەموو
+            <span class="stage-pill-count">{{ totalStagedCustomers }}</span>
+          </button>
+
+          <button
+            v-for="s in STAGE_ORDER"
+            :key="s"
+            class="stage-pill stage-pill-btn"
+            :class="{
+              'stage-pill-active': stageFilter === s,
+              'stage-pill-inactive': stageFilter !== null && stageFilter !== s
+            }"
+            :style="stageFilter === s
+              ? { background: STAGE_COLORS[s], borderColor: STAGE_COLORS[s], color: '#fff', transform: 'translateY(-3px)', boxShadow: '0 8px 20px ' + STAGE_COLORS[s] + '55' }
+              : { background: STAGE_COLORS[s] + '15', borderColor: STAGE_COLORS[s] + '40', color: STAGE_COLORS[s] }
+            "
+            @click="toggleStageFilter(s)"
+          >
             <span>{{ STAGE_EMOJI[s] }}</span>
             {{ stageLabel(s) }}
-            <span class="stage-pill-count">{{ stageTotals[s] ?? 0 }}</span>
-          </span>
+            <span
+              class="stage-pill-count"
+              :style="stageFilter === s
+                ? { background: 'rgba(255,255,255,0.25)', color: '#fff' }
+                : { background: STAGE_COLORS[s] + '25', color: STAGE_COLORS[s] }
+              "
+            >{{ stageTotals[s] ?? 0 }}</span>
+          </button>
         </div>
 
         <!-- Empty State -->
-        <div v-if="!filteredMulks.length" class="empty-state">
+        <div v-if="!filteredMulks.length" class="empty-state scroll-reveal">
           <div class="empty-icon">🏚</div>
           <p class="empty-title">هیچ موڵکێک نەدۆزرایەوە</p>
           <p class="empty-sub">فلتەرەکانت بگۆڕە یان موڵکی نوێ زیاد بکە</p>
@@ -143,7 +178,7 @@
           <div
             v-for="(mulk, idx) in filteredMulks"
             :key="mulk.id"
-            class="mulk-card"
+            class="mulk-card scroll-reveal"
             :style="{ animationDelay: `${idx * 40}ms` }"
             @click="openMulkDetail(mulk)"
           >
@@ -244,7 +279,7 @@
         </div>
 
         <!-- List View -->
-        <div v-else class="list-wrap">
+        <div v-else class="list-wrap scroll-reveal">
           <table class="mulk-table">
             <thead>
               <tr>
@@ -499,20 +534,17 @@
             <div class="cust-color-band" :style="{ background: c.color ?? '#22c55e' }"></div>
             <div class="cust-card-body">
 
-              <!-- Name -->
               <div class="cust-name-row">
                 <span class="cust-color-dot" :style="{ background: c.color ?? '#22c55e' }"></span>
                 <p class="cust-name">{{ c.name }}</p>
                 <span v-if="c.backed_from_pricing" class="backed-badge">↩ گەڕاوەتەوە</span>
               </div>
 
-              <!-- Stage -->
               <div class="cust-stage-badge" :style="{ background: STAGE_COLORS[c.current_stage] }">
                 <span>{{ STAGE_EMOJI[c.current_stage] }}</span>
                 {{ stageLabel(c.current_stage) }}
               </div>
 
-              <!-- ✅ Phone — works because controller now selects phone -->
               <div v-if="c.phone" class="cust-contact-row">
                 <span class="cust-phone-num">{{ c.phone }}</span>
                 <div class="flex gap-1">
@@ -528,7 +560,6 @@
                 </div>
               </div>
 
-              <!-- Price -->
               <div v-if="c.price_one || c.price_two" class="cust-price-row">
                 <svg class="w-3 h-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <span v-if="c.price_one">لە {{ commaNumber(c.price_one) }}$</span>
@@ -536,17 +567,13 @@
                 <span v-if="c.price_two">بۆ {{ commaNumber(c.price_two) }}$</span>
               </div>
 
-              <!-- Timing -->
               <div v-if="c.stage_start_time" class="cust-timing">
                 <div class="timing-row"><span class="timing-dot start"></span><span>{{ formatDate(c.stage_start_time) }}</span></div>
                 <div v-if="c.stage_end_time" class="timing-row"><span class="timing-dot end"></span><span>{{ formatDate(c.stage_end_time) }}</span></div>
                 <div class="timing-row duration"><span>⏱</span><span class="font-semibold text-blue-600">{{ getTimeBetween(c.stage_start_time, c.stage_end_time) }}</span></div>
               </div>
 
-              <!-- Stage note -->
               <div v-if="c.stage_note" class="cust-note">📝 {{ c.stage_note }}</div>
-
-              <!-- ✅ Customer note — works because controller now selects note -->
               <div v-if="c.note" class="cust-note slate">💬 {{ c.note }}</div>
             </div>
           </div>
@@ -610,6 +637,8 @@ const searchText     = ref('');
 const sortBy         = ref('customers_desc');
 const viewMode       = ref('grid');
 const loading        = ref(false);
+// ✅ NEW: stage filter for the legend pills
+const stageFilter    = ref(null);
 let   refreshTimer;
 
 // ── Dialog State ──────────────────────────────────────────────────────────────
@@ -630,10 +659,16 @@ function openMulkDetail(mulk) {
   detailVisible.value     = true;
 }
 
+// ✅ NEW: toggle stage filter — click same stage again to deselect
+function toggleStageFilter(stage) {
+  stageFilter.value = stageFilter.value === stage ? null : stage;
+}
+
 function clearAllFilters() {
   searchText.value = '';
   filterType.value = [];
   filterLocation.value = [];
+  stageFilter.value = null;
   searchQuery.value.datefilter = null;
 }
 
@@ -651,6 +686,13 @@ const filteredMulks = computed(() => {
   }
   if (filterType.value.length)     list = list.filter(m => filterType.value.includes(m.type_project?.id));
   if (filterLocation.value.length) list = list.filter(m => filterLocation.value.includes(m.location?.id));
+
+  // ✅ NEW: filter by stage — keep only mulks that have at least 1 customer in this stage
+  if (stageFilter.value) {
+    list = list.filter(m =>
+      (m.customers ?? []).some(c => c.current_stage === stageFilter.value)
+    );
+  }
 
   return [...list].sort((a, b) => {
     switch (sortBy.value) {
@@ -692,12 +734,14 @@ const uniqueLocations = computed(() =>
 );
 
 const hasActiveFilters = computed(() =>
-  searchText.value || filterType.value.length || filterLocation.value.length || searchQuery.value.datefilter
+  searchText.value || filterType.value.length || filterLocation.value.length ||
+  searchQuery.value.datefilter || stageFilter.value
 );
 
 const stageTotals = computed(() => {
   const t = {};
-  for (const m of filteredMulks.value) {
+  // ✅ Count from ALL mulks (not filtered) so totals in pills are always accurate
+  for (const m of (props.data.mulks ?? []).filter(m => !m.is_archived)) {
     for (const c of m.customers ?? []) {
       const s = c.current_stage ?? 'unknown';
       t[s] = (t[s] ?? 0) + 1;
@@ -706,9 +750,14 @@ const stageTotals = computed(() => {
   return t;
 });
 
+// ✅ NEW: total customers across all stages (for "all" pill)
+const totalStagedCustomers = computed(() =>
+  Object.values(stageTotals.value).reduce((s, n) => s + n, 0)
+);
+
 const kpiCards = computed(() => [
   { label: 'موڵکی ئامادە',  value: filteredMulks.value.length,  color: 'emerald', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>' },
-  { label: 'کۆی کڕیار',    value: totalCustomers.value,        color: 'blue',    icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' },
+  { label: 'کۆی کڕیار',    value: props.data.customer_count,        color: 'blue',    icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' },
   { label: 'ناوەندی نرخ',  value: avgPriceFormatted.value,     color: 'gold',    icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' },
   { label: 'کۆی ڕووبەر',   value: totalAreaFormatted.value,    color: 'purple',  icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"/></svg>' },
   { label: 'شوێنەکان',     value: uniqueLocations.value,       color: 'rose',    icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' },
@@ -774,8 +823,47 @@ function fetchPage() {
 }
 
 watch(searchQuery, () => { clearTimeout(refreshTimer); fetchPage(); }, { deep: true });
-onMounted(()   => { refreshTimer = setTimeout(fetchPage, 600_000); });
-onUnmounted(() => { clearTimeout(refreshTimer); });
+
+// ── Scroll Reveal (IntersectionObserver) ─────────────────────────────────────
+let scrollObserver = null;
+
+function initScrollReveal() {
+  scrollObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          scrollObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+  );
+
+  document.querySelectorAll('.scroll-reveal').forEach(el => {
+    scrollObserver.observe(el);
+  });
+}
+
+// Re-run observer when grid items re-render
+watch(filteredMulks, () => {
+  setTimeout(() => {
+    document.querySelectorAll('.scroll-reveal:not(.revealed)').forEach(el => {
+      scrollObserver?.observe(el);
+    });
+  }, 50);
+});
+
+onMounted(() => {
+  refreshTimer = setTimeout(fetchPage, 600_000);
+  // small delay so DOM is painted
+  setTimeout(initScrollReveal, 100);
+});
+
+onUnmounted(() => {
+  clearTimeout(refreshTimer);
+  scrollObserver?.disconnect();
+});
 </script>
 
 <style scoped>
@@ -797,6 +885,33 @@ onUnmounted(() => { clearTimeout(refreshTimer); });
 }
 @media (min-width: 640px)  { .dashboard-container { padding: 0 1.5rem; } }
 @media (min-width: 1024px) { .dashboard-container { padding: 0 2rem; } }
+
+/* ════════════════════════════════════════
+   PAGE ENTRANCE ANIMATIONS
+════════════════════════════════════════ */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-enter {
+  animation: pageEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+/* ════════════════════════════════════════
+   SCROLL REVEAL
+════════════════════════════════════════ */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 /* ════════════════════════════════════════
    HEADER PILLS
@@ -925,30 +1040,82 @@ onUnmounted(() => { clearTimeout(refreshTimer); });
 .filter-chip {
   display: inline-flex; align-items: center; gap: 0.25rem;
   background: #f1f5f9; color: #475569;
-  border: none; cursor: pointer;
+  border: 1px solid #e2e8f0; cursor: pointer;
   font-size: 0.7rem; font-weight: 600; font-family: 'NRT', sans-serif;
   border-radius: 9999px; padding: 0.25rem 0.625rem;
   transition: all 0.15s;
 }
-.filter-chip:hover { background: #fee2e2; color: #dc2626; }
-.filter-chip.danger { background: #fee2e2; color: #dc2626; }
+.filter-chip:hover { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
+.filter-chip.danger { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
 
 .slide-down-enter-active, .slide-down-leave-active { transition: all 0.2s ease; }
 .slide-down-enter-from, .slide-down-leave-to { opacity: 0; transform: translateY(-8px); }
 
 /* ════════════════════════════════════════
-   STAGE LEGEND
+   ✅ STAGE LEGEND — clickable button pills
 ════════════════════════════════════════ */
 .stage-legend { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.stage-pill {
-  display: inline-flex; align-items: center; gap: 0.375rem;
-  padding: 0.35rem 0.875rem; border-radius: 9999px;
-  color: #fff; font-size: 0.72rem; font-weight: 700;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+
+.stage-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
 }
+
+/* ripple on click */
+.stage-pill-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.3);
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: inherit;
+}
+.stage-pill-btn:active::after { opacity: 1; }
+
+.stage-pill-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* dim non-selected pills when a filter is active */
+.stage-pill-inactive {
+  opacity: 0.5;
+  transform: scale(0.96);
+}
+.stage-pill-inactive:hover {
+  opacity: 0.8;
+  transform: translateY(-1px) scale(0.98);
+}
+
 .stage-pill-count {
-  background: rgba(255,255,255,0.25);
-  border-radius: 9999px; padding: 0.05rem 0.5rem; font-size: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  padding: 0 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  transition: background 0.2s, color 0.2s;
 }
 
 /* ════════════════════════════════════════
@@ -981,13 +1148,13 @@ onUnmounted(() => { clearTimeout(refreshTimer); });
   cursor: pointer; overflow: hidden;
   display: flex; flex-direction: column;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
-  animation: cardIn 0.35s ease both;
   position: relative;
 }
-@keyframes cardIn {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* card stagger is driven by scroll-reveal + inline animationDelay */
+.mulk-card.revealed {
+  transition-delay: var(--stagger, 0ms);
 }
+
 .mulk-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
 
 .card-accent { height: 5px; width: 100%; flex-shrink: 0; }
@@ -1210,7 +1377,6 @@ onUnmounted(() => { clearTimeout(refreshTimer); });
   padding: 0.5rem; border-radius: 0.625rem; color: #fff; font-size: 0.8rem; font-weight: 800;
 }
 
-/* ✅ Customer contact row — phone number + action buttons */
 .cust-contact-row {
   display: flex; align-items: center; justify-content: space-between;
   background: #f8fafc; border-radius: 0.5rem; padding: 0.375rem 0.625rem;

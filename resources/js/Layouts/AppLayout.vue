@@ -353,6 +353,10 @@ const showDocsDropdown = ref(false);
                             :active="route().current('dashboard')">
                             داشبۆرد
                         </ResponsiveNavLink>
+                        <ResponsiveNavLink v-if="can('read dashboard')" :href="route('mulks.dashboard')"
+                            :active="route().current('mulks.dashboard')">
+                            داشبۆرد ٢
+                        </ResponsiveNavLink>
 
                         <ResponsiveNavLink v-if="can('read users')" :href="route('users.index')"
                             :active="route().current('users.index')">

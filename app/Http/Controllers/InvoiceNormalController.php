@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\InvoiceNormalRequest;
 use App\Models\InvoiceNormal;
+use App\Models\TypeProject;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,8 +36,11 @@ class InvoiceNormalController extends Controller
             ->paginate($perpage)
             ->withQueryString();
 
+                $typemulks=TypeProject::select('id', 'name')->get(); // ✅
+
         return Inertia::render('InvoicesNormal/Index', [
             'data' => $query,
+            'typeProjects' => $typemulks,
             'filters' => [
                 'q' => $q,
                 'datefilter' => $dateOne && $dateTwo

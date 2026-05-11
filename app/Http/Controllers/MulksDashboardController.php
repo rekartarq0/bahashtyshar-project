@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Mulks;
+use App\Models\Customers;
 use App\Models\Locations;
+use App\Models\Mulks;
 use App\Models\TypeProject;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,45 +17,46 @@ class MulksDashboardController extends Controller
 
         // ── Build base query: non-archived mulks only ──────────────────────────
         $query = Mulks::query()
-->where(function ($q) {
-        $q->where('is_archived', false)
-          ->orWhereNull('is_archived'); // ✅ NULL ش cover دەکات
-    })            ->with([
-                'location',
-                'typeProject',
-                'images',
+            ->where(function ($q) {
+                $q->where('is_archived', false)
+                    ->orWhereNull('is_archived'); // ✅ NULL ش cover دەکات
+            })->with([
+        'location',
+        'typeProject',
+        'images',
 
-                // Customers with their latest stage info
-                'customers' => function ($q) {
-                    $q->select(
-                        'customers.id',
-                        'customers.name',
-                        'customers.color',
-                        'customers.price_one',
-                        'customers.price_two',
-                    )
-                    ->with([
-                        'mulkstages' => function ($sq) {
-                            $sq->select(
-                                'id',
-                                'mulk_id',
-                                'customer_id',
-                                'stage',
-                                'start_time',
-                                'end_time',
-                                'note',
-                                'backed_from_pricing',
-                            )
+        // Customers with their latest stage info
+        'customers' => function ($q) {
+            $q->select(
+                'customers.id',
+                'customers.name',
+                'customers.color',
+                'customers.phone',
+                'customers.price_one',
+                'customers.price_two',
+            )
+                ->with([
+                    'mulkstages' => function ($sq) {
+                        $sq->select(
+                            'id',
+                            'mulk_id',
+                            'customer_id',
+                            'stage',
+                            'start_time',
+                            'end_time',
+                            'note',
+                            'backed_from_pricing',
+                        )
                             ->orderByDesc('created_at');
-                        }
-                    ]);
-                },
-            ])
+                    },
+                ]);
+        },
+    ])
             ->withCount(['customers as customer_count']); // ✅ alias so column is named customer_count
 
         // ── Date filter ───────────────────────────────────────────────────────
-        if (!empty($datefilter) && is_array($datefilter) && count($datefilter) === 2) {
-            $query->whereBetween('created_at', [$datefilter[0], $datefilter[1] . ' 23:59:59']);
+        if (! empty($datefilter) && is_array($datefilter) && count($datefilter) === 2) {
+            $query->whereBetween('created_at', [$datefilter[0], $datefilter[1].' 23:59:59']);
         }
 
         $mulks = $query->orderByDesc('customer_count')->get(); // ✅ matches alias
@@ -68,27 +70,29 @@ class MulksDashboardController extends Controller
                     ->first(); // already sorted desc
 
                 // Fallback to any latest stage if no mulk-scoped one found
-                if (!$latestStage) {
+                if (! $latestStage) {
                     $latestStage = $customer->mulkstages->first();
                 }
 
-                $customer->current_stage       = $latestStage?->stage ?? 'request';
-                $customer->stage_start_time    = $latestStage?->start_time;
-                $customer->stage_end_time      = $latestStage?->end_time;
-                $customer->stage_note          = $latestStage?->note;
+                $customer->current_stage = $latestStage?->stage ?? 'request';
+                $customer->stage_start_time = $latestStage?->start_time;
+                $customer->stage_end_time = $latestStage?->end_time;
+                $customer->stage_note = $latestStage?->note;
                 $customer->backed_from_pricing = $latestStage?->backed_from_pricing ?? false;
 
                 // Remove raw mulkstages from response to keep payload lean
                 unset($customer->mulkstages);
             });
         });
+        $customer_count = Customers::where('is_archived', false)->count();
 
         return Inertia::render('Mulksdashboard', [
             'data' => [
-                'mulks'        => $mulks,
-                'locations'    => Locations::orderBy('name')->get(['id', 'name']),
+                'mulks' => $mulks,
+                'customer_count' => $customer_count,
+                'locations' => Locations::orderBy('name')->get(['id', 'name']),
                 'typeProjects' => TypeProject::orderBy('name')->get(['id', 'name']),
-                'datefilter'   => $datefilter,
+                'datefilter' => $datefilter,
             ],
         ]);
     }
